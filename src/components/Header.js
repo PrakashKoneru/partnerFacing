@@ -24,7 +24,7 @@ export default function Header() {
 	return (
 		<HeaderContainer>
 			<Logo>
-				<img src={LogoImg} height={60} width={185}/>
+				<img src={LogoImg} height={60} width={185} alt='Paisa Logo' />
 			</Logo>
 		</HeaderContainer>
 	)

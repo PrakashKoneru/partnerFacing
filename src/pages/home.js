@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import acceptedData from './acceptedData';
+// import acceptedData from '../acceptedData';
 import styled from 'styled-components'
-import MappedCards from './components/MappedCards';
-import Header from './components/Header';
+import MappedCards from '../components/MappedCards';
+import Header from '../components/Header';
 
 const fieldLineUp = [
 	{
@@ -145,12 +145,13 @@ const Input = styled.input`
 `;
 
 export default function Home() {
-		const [sortBy, setSortBy] = useState('funded_amnt');
+	const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
+	const [sortBy, setSortBy] = useState('funded_amnt');
     return (
 			<div>
 				<Header />
 				<NavBar>
-					<NavItem style={{ background: '#0079C6', color: 'white'}}>New Loans</NavItem>
+					<NavItem style={{ background: '#0079C6', color: 'white'}}>New Loans({acceptedData.length - 1})</NavItem>
 					<NavItem>Pending Loans</NavItem>
 					<NavItem>Approved Loans</NavItem>
 					<NavItem>Rejected Loans</NavItem>
