@@ -30,8 +30,21 @@ const Buttons = styled.div`
 	border: 1px solid rgba(224,210,210, 0.6);
 `;
 
-const MappedCards = ({ member, index, fieldLineUp }) => {
+const MappedCards = ({ member, index, fieldLineUp, ...rest }) => {
 	const [colShown, setColShown] = useState(5);
+	const updateData = (approval_status) => {
+		const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
+		const updatedApplication = { ...member, approval_status }
+		const newApplicationData = acceptedData.map((each) => {
+			console.log(each.id, member);
+			if(each.id === member.id) {
+				console.log('right block if called')
+				each = updatedApplication;
+			}
+			return each;
+		});
+		localStorage.setItem('acceptedData', JSON.stringify(newApplicationData));
+	};
 	return (
 		<>
 			<Grid>
@@ -51,13 +64,25 @@ const MappedCards = ({ member, index, fieldLineUp }) => {
 			<Expand>
 				{colShown >= 15 ? (
 					<div>
-						<Buttons style={{background: '#76d600', color: 'white'}}>
+						<Buttons
+							style={{background: '#76d600', color: 'white'}}
+							onClick={() => updateData('approved')}
+						>
 							Approve
 						</Buttons>
-						<Buttons style={{background: '#E12a5a', color: 'white'}}>
+						<Buttons
+							style={{background: '#E12a5a', color: 'white'}}
+							onClick={() => updateData('rejected')}
+						>
 							Reject
 						</Buttons>
-						<Buttons>
+						<Buttons
+							onClick={() => updateData('pending')}
+						>
+							Decide Later
+						</Buttons>
+						<Buttons
+						>
 							<Link to={`/loans/${index}`}>All Details</Link>
 						</Buttons>
 					</div>

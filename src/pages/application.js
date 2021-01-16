@@ -16,7 +16,7 @@ const Application =  () => {
   const postData = async (data) => {
      const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
      const lastApplication = acceptedData[acceptedData.length - 1];
-     const newApplicationData = {...(acceptedData[acceptedData.length - 1]), ...data}
+     const newApplicationData = {...(acceptedData[acceptedData.length - 1]), ...data, id: (lastApplication['id'] + 1)}
      localStorage.setItem('acceptedData', JSON.stringify([...acceptedData, newApplicationData]));
   }
   
@@ -45,6 +45,12 @@ const Application =  () => {
           <Input
             name="ssn"
             placeholder="SSN"
+            type='number'
+            register={register}
+          />
+          <Input
+            name="requested_amount"
+            placeholder="Requested Amount"
             type='number'
             register={register}
           />

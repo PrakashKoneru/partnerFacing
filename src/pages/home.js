@@ -6,7 +6,7 @@ import Header from '../components/Header';
 
 const fieldLineUp = [
 	{
-		title: 'Funded Amount',
+		title: 'Requested Amount',
 		def: 'funded_amnt'
 	},
 	{
@@ -147,14 +147,36 @@ const Input = styled.input`
 export default function Home() {
 	const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
 	const [sortBy, setSortBy] = useState('funded_amnt');
+	const [filterBy, setFilterBy] = useState('new');
+	const activeTabStyle = { background: '#0079C6', color: 'white'};
     return (
 			<div>
 				<Header />
 				<NavBar>
-					<NavItem style={{ background: '#0079C6', color: 'white'}}>New Loans({acceptedData.length - 1})</NavItem>
-					<NavItem>Pending Loans</NavItem>
-					<NavItem>Approved Loans</NavItem>
-					<NavItem>Rejected Loans</NavItem>
+					<NavItem
+						style={filterBy === 'new' ? activeTabStyle : {}}
+						onClick={() => setFilterBy('new')}
+					>
+						New Loans({(acceptedData.filter((each) => each.approval_status === 'new').length)})
+					</NavItem>
+					<NavItem
+						style={filterBy === 'pending' ? activeTabStyle : {}}
+						onClick={() => setFilterBy('pending')}
+					>
+						Pending Loans({(acceptedData.filter((each) => each.approval_status === 'pending').length)})
+					</NavItem>
+					<NavItem
+						style={filterBy === 'approved' ? activeTabStyle : {}}
+						onClick={() => setFilterBy('approved')}
+					>
+						Approved Loans({(acceptedData.filter((each) => each.approval_status === 'approved').length)})
+					</NavItem>
+					<NavItem
+						style={filterBy === 'rejected' ? activeTabStyle : {}}
+						onClick={() => setFilterBy('rejected')}
+					>
+						Rejected Loans({(acceptedData.filter((each) => each.approval_status === 'rejected').length)})
+					</NavItem>
 				</NavBar>
 				<ItemsGrid>
 					<Actions>
@@ -204,7 +226,9 @@ export default function Home() {
 						</StickyContainer>
 					</Actions>
 					<DisplayItems>
-						{acceptedData.sort((a, b) => a[sortBy] - b[sortBy]).map((member, index) => {
+						{acceptedData
+							.filter((each) => each.approval_status === filterBy)
+							.sort((a, b) => a[sortBy] - b[sortBy]).map((member, index) => {
 							return (
 								<Card key={Math.random()}>
 									<MappedCards member={member} index={index} fieldLineUp={fieldLineUp}/>
