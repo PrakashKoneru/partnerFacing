@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components'
 import LogoImg from './logo.png';
-import { Link } from 'react-router-dom';
 
 const HeaderContainer = styled.div`
 	display: flex;
@@ -24,13 +23,9 @@ const Logo = styled.div`
 export default function Header() {
 	return (
 		<HeaderContainer>
-			<div style={{ width: '100%' }}>
-				<Link to='/'>
-					<Logo>
-						<img src={LogoImg} height={60} width={185} alt='Paisa Logo' />
-					</Logo>
-				</Link>
-			</div>
+			<Logo>
+				<img src={LogoImg} height={60} width={185} alt='Paisa Logo' />
+			</Logo>
 		</HeaderContainer>
 	)
 }
