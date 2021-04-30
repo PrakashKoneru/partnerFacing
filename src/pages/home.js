@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import MappedCards from '../components/MappedCards';
 import fieldLineUp from '../fieldLineUp';
 
-
 const NavBar = styled.div`
 	display: flex;
 	padding-left: 30px;

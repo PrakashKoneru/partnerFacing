@@ -15272,7 +15272,7 @@ const acceptedData = [
     "sec_app_open_act_il": "",
     "sec_app_num_rev_accts": "",
     "sec_app_chargeoff_within_12_mths": "",
-    "sec_app_collections_12_mths_ex_med": "",
+    "sec_app_collections_12_mth s_ex_med": "",
     "sec_app_mths_since_last_major_derog": "",
     "hardship_flag": "N",
     "hardship_type": "",
