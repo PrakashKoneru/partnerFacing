@@ -86,7 +86,7 @@ export default function Home() {
 	const [sortBy, setSortBy] = useState('funded_amnt');
 	const [filterBy, setFilterBy] = useState('new');
 	const activeTabStyle = { background: '#0079C6', color: 'white'};
-	
+	// console.log(acceptedData, 'acceptedData');
     return (
 			<div>
 				<NavBar>
@@ -163,9 +163,11 @@ export default function Home() {
 						</StickyContainer>
 					</Actions>
 					<DisplayItems>
+						{console.log(acceptedData, 'acceptedData')}
 						{acceptedData
 							.filter((each) => each.approval_status === filterBy)
 							.sort((a, b) => a[sortBy] - b[sortBy]).map((member, index) => {
+								console.log(member, 'menber')
 							return (
 								<Card key={Math.random()}>
 									<MappedCards member={member} index={index} fieldLineUp={fieldLineUp}/>
