@@ -1,5 +1,19 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Tooltip,
+  Label,
+	LabelList,
+	PieChart,
+	Pie,
+	Sector,
+	Cell
+} from "recharts";
 import fieldLineUp from '../fieldLineUp';
 import MappedCards from '../components/MappedCards';
 
@@ -78,28 +92,93 @@ const Card = styled.div`
 	margin-left: 30px;
 `
 
+// const renderCustomizedLabel = (props) => {
+//   const { content, ...rest } = props;
+
+//   return <Label {...rest} fontSize="12" fill="#FFFFFF" fontWeight="Bold" />;
+// };
+
+const RADIAN = Math.PI / 180;
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
 const LoanGroups = (props) => {
 	const [view, setView] = useState('listView');
+	const [groupingState, setGroupinState] = useState('issue_m');
 	const [expandedLoanGroup, setExpandedLoanGroup] = useState(null)
 	const allLoans = JSON.parse(localStorage.getItem('acceptedData'));
-	const loansByTerm = allLoans.reduce((loan, value) => {
-		// var oneDate = moment(loan[value.issue_d], 'DD-MM-YYYY');
-    // var monthName = oneDate.format('MMMM');
-
-		console.log(loan, 'loan avlue');
-		// Group initialization
-		if (!loan[value.grade]) {
-			loan[value.grade] = {
+	const loansBySelectedGroup = allLoans.reduce((loan, value) => {
+		if (!loan[value[groupingState]]) {
+			loan[value[groupingState]] = {
 				loans: [],
 				loan_amnt: 0,
 			};
 		}
 	 
 		// Grouping
-		loan[value.grade]['loans'] = [...loan[value.grade]['loans'], value];
-		loan[value.grade]['loan_amnt'] = loan[value.grade]['loan_amnt'] + parseInt(value['loan_amnt'], "10")
+		loan[value[groupingState]]['loans'] = [...loan[value[groupingState]]['loans'], value];
+		loan[value[groupingState]]['loan_amnt'] = loan[value[groupingState]]['loan_amnt'] + parseInt(value['loan_amnt'], "10")
 		return loan;
 	}, {});
+
+	const grapViewCalculations = {
+		total_invested: 0,
+		total_returns: 0,
+		principal_paid: 0,
+		principal_left: 0,
+		expected_principal: 0,
+		expected_return: 0,
+		principal_charged_off: 0
+	}
+	allLoans.map((loan) => {
+		grapViewCalculations.total_invested = grapViewCalculations.total_invested + parseInt (loan.funded_amnt, 10)
+		grapViewCalculations.total_returns = grapViewCalculations.total_returns + parseInt (loan.returns_received, 10)
+		grapViewCalculations.principal_paid = grapViewCalculations.principal_paid + parseInt (loan.principal_paid, 10)
+		grapViewCalculations.principal_left = loan.status === '1' ? grapViewCalculations.principal_left + parseInt (loan.principal_left, 10) : grapViewCalculations.principal_left;
+		grapViewCalculations.expected_principal = 0.98 * grapViewCalculations.principal_left;
+		grapViewCalculations.expected_return = 0.0225 * grapViewCalculations.principal_left;
+		grapViewCalculations.principal_charged_off = (loan.status === '2' || loan.status === '3') ? grapViewCalculations.principal_charged_off + (parseInt(loan.principal_left, 10) - parseInt(loan.collected_principal, 10)) : grapViewCalculations.principal_charged_off;
+	})
+
+	const principalGraphData = [
+		{ 
+			name: "Principal",
+			returned: grapViewCalculations.principal_paid,
+			left: grapViewCalculations.principal_left,
+			moneyLost: grapViewCalculations.principal_charged_off
+		}
+	];
+
+	const piechartDivison = allLoans.reduce((loan, value) => {
+		if (!loan[value['status']]) {
+			loan[value['status']] = {
+				loans: [],				
+			};
+		}
+	 
+		// Grouping
+		loan[value['status']]['loans'] = [...loan[value['status']]['loans'], value];
+		return loan;
+	}, {});
+
+	const pieChartData = [
+		{ name: "Active", value: piechartDivison['1'] ? piechartDivison['1'].loans.length : 0, fill: '#0088FE' },
+		{ name: "Charged off", value: piechartDivison['2'] ? piechartDivison['2'].loans.length : 0, fill: '#dd7876' },
+		{ name: "Default", value: piechartDivison['3'] ? piechartDivison['3'].loans.length : 0, fill: '#FFBB28' },
+		{ name: "Completed", value: piechartDivison['4'] ? piechartDivison['4'].loans.length : 0, fill: '#82ba7f' }
+	];
+
+	console.log(pieChartData, 'pieChartData')
+
 	const activeTabStyle = { background: '#0079C6', color: 'white'};
 
 	return (
@@ -126,16 +205,16 @@ const LoanGroups = (props) => {
 							<Select
 								name="loans"
 								id="loans"
-								// onChange={(e) => {setSortBy(e.target.value)}}
+								onChange={(e) => {setGroupinState(e.target.value)}}
 							>
-								<Option value={'term'}>Term</Option>
-								<Option value={'year'}>Year</Option>
+								<Option value='issue_m'>Month</Option>
+								<Option value='grade'>Grade</Option>
 							</Select>
 						</StickyContainer>
 					</Actions>
 					<div style={{ width: '100%'}}>
-						{Object.keys(loansByTerm).map((groupName, value) => {
-							const group = loansByTerm[groupName]
+						{Object.keys(loansBySelectedGroup).map((groupName, value) => {
+							const group = loansBySelectedGroup[groupName]
 							return (
 								<div style={{ marginTop: '15px', width: '100%' }}>
 									<GroupActions>
@@ -155,7 +234,6 @@ const LoanGroups = (props) => {
 											</div>
 										</div>
 									</GroupActions>
-									{console.log(expandedLoanGroup !== groupName)}
 									{expandedLoanGroup !== groupName ? (
 										<Card>
 											<div>
@@ -188,6 +266,158 @@ const LoanGroups = (props) => {
 						})}
 					</div>
 				</ItemsGrid>
+			)}
+			{view === 'graphView' && (
+				<>
+					<ItemsGrid>
+						<>
+							{Object.keys(grapViewCalculations).map((eachCalcluation) => {
+								return (
+									<div
+										style={{ 
+											width: '25%',
+											textAlign: 'center',
+											border: '1px solid black',
+											padding: '25px',
+											marginRight: '25px'
+										}}>
+										<div>
+											{eachCalcluation.split('_').map((string) => { return string.charAt(0).toUpperCase() + string.slice(1)}).join(' ')}
+										</div>
+										<div style={{ marginTop: '8px', textAlign: 'center' }}>
+											{grapViewCalculations[eachCalcluation]}
+										</div>
+									</div>
+								)
+							})}
+						</>
+					</ItemsGrid>
+					<div
+						style={{
+							marginTop: '50px',
+							paddingLeft: '30px',
+							paddingRight: '30px'
+						}}
+					>
+						<div>
+							<div>
+								<div
+									style={{
+										fontWeight: 600
+									}}
+								>
+									Principal Data Graph
+								</div>
+							</div>
+							<div 
+								style={{
+									marginTop: '50px',
+									marginLeft: "-50px"
+								}}
+							>
+								<ResponsiveContainer
+									height={250}
+									width={"90%"}
+								>
+								<BarChart
+									layout="vertical"
+									data={principalGraphData}
+									margin={{ left: 50, right: 50 }}
+									stackOffset="expand"
+								>
+									<XAxis type="number" />
+									<YAxis
+										type="category"
+										dataKey="name"
+										fontSize="12"
+									/>
+									<Tooltip />
+									<Bar dataKey="returned" fill="#82ba7f"  stackId="a">
+										<LabelList
+											dataKey="returned"
+											position="center"
+										/>
+									</Bar>
+									<Bar dataKey="left" fill="#76a8dd" stackId="a">
+										<LabelList
+											dataKey="left"
+											position="center"
+										/>
+									</Bar>
+									<Bar dataKey="moneyLost" fill="#dd7876" stackId="a">
+										<LabelList
+											dataKey="moneyLost"
+											position="center"
+										/>
+									</Bar>
+								</BarChart>
+								</ResponsiveContainer>
+							</div>
+						</div>
+						{/* Graph Gap */}
+						<div>
+							<div
+								style={{
+									marginTop: '50px',
+									fontWeight: 600
+								}}
+							>
+								Loan Standings
+							</div>
+							<div>
+								<div style={{ marginLeft: '-70px' }}>
+									<ResponsiveContainer width="100%" height={400}>
+										<PieChart width={400} height={400}>
+											<Pie
+												data={pieChartData.filter((entry) => { return entry.value != 0 })}
+												cx="50%"
+												cy="50%"
+												labelLine={false}
+												label={renderCustomizedLabel}
+												outerRadius={125}
+												fill="#8884d8"
+												dataKey="value"
+											>
+												{pieChartData.filter((entry) => { return entry.value != 0 }).map((entry, index) => (
+													<Cell key={`cell-${index}`} fill={entry.fill} />
+												))}
+											</Pie>
+										</PieChart>
+									</ResponsiveContainer>
+								</div>
+								<div
+									style={{ 
+										display: 'flex',
+										justifyContent: 'center'
+									}}
+								>
+									{pieChartData.map((entry) => {
+										return (
+											<div style={{
+												display: 'flex',
+												alignItems: 'center',
+												marginRight: '40px',
+												paddingBottom: '80px',
+												marginTop: '-40px'
+											}}>
+												<div
+													style={{
+														height: '25px',
+														width: '25px',
+														backgroundColor: entry.fill,
+														marginRight: '8px'
+													}}
+												>
+												</div>
+												<div>{entry.name}</div>
+											</div>
+										)
+									})}
+								</div>
+							</div>
+						</div>
+					</div>
+				</>
 			)}
 		</div>
 	)

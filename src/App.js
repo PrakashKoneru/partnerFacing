@@ -1,3 +1,4 @@
+import moment from 'moment';
 import Header from './components/Header';
 import Home from './pages/home'
 import Loans from './pages/loans'
@@ -13,7 +14,13 @@ import './styles/globals.css';
 
 function App() {
   if(!localStorage.getItem('acceptedData')) {
-    localStorage.setItem('acceptedData', JSON.stringify(acceptedData));
+    const updatedData = acceptedData.map((loan) => {
+      var oneDate = moment(loan.issue_d, 'MM/DD/YYYY');
+      var monthName = oneDate.format('MMMM');
+      loan.issue_m = monthName;
+      return loan
+    })
+    localStorage.setItem('acceptedData', JSON.stringify(updatedData));
   }
 
   return (
