@@ -176,9 +176,6 @@ const LoanGroups = (props) => {
 		{ name: "Default", value: piechartDivison['3'] ? piechartDivison['3'].loans.length : 0, fill: '#FFBB28' },
 		{ name: "Completed", value: piechartDivison['4'] ? piechartDivison['4'].loans.length : 0, fill: '#82ba7f' }
 	];
-
-	console.log(pieChartData, 'pieChartData')
-
 	const activeTabStyle = { background: '#0079C6', color: 'white'};
 
 	return (
