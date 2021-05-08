@@ -10,6 +10,7 @@ const HeaderContainer = styled.div`
 	border-bottom: 0.3px solid rgba(224,210,210, 0.6);
 	position: relative;
 	user-select: none;
+	maxWidth: 1200px;
 `;
 
 const Logo = styled.div`
