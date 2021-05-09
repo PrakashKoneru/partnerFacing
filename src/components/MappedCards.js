@@ -21,6 +21,7 @@ const Expand = styled.div`
 `;
 
 const Buttons = styled.div`
+	margin-left: 15px;
 	margin-bottom: 10px;
 	width: 125px;
 	border-radius: 5px;
@@ -30,24 +31,46 @@ const Buttons = styled.div`
 	border: 1px solid rgba(224,210,210, 0.6);
 `;
 
-const MappedCards = ({ member, index, fieldLineUp, noActions, ...rest }) => {
+const MappedCards = ({ member, index, fieldLineUp, noActions, setAcceptedData, ...rest }) => {
 	const [colShown, setColShown] = useState(5);
+	const [loadingState, setLoadingState] = useState(null);
 	const updateData = (approval_status) => {
+		setLoadingState(approval_status)
 		const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
 		const updatedApplication = { ...member, approval_status }
 		const newApplicationData = acceptedData.map((each) => {
-			console.log(each.id, member);
 			if(each.id === member.id) {
-				console.log('right block if called')
 				each = updatedApplication;
 			}
 			return each;
 		});
 		localStorage.setItem('acceptedData', JSON.stringify(newApplicationData));
+		setTimeout(() => setAcceptedData(newApplicationData), 750);
 	};
+	console.log(member.approval_status);
+	const colorHelper = {
+		approved: '#179942',
+		rejected: '#FA1103',
+		pending: '#19858F',
+	}
+	if(loadingState) return (<div
+		style={{
+			display: 'flex',
+			justifyContent: 'center',
+			width: '100%',
+			color: colorHelper[loadingState],
+			fontSize: '25px',
+			height: '75px',
+			alignItems: 'center'
+		}}
+	>
+		{
+			`Added to ${loadingState.charAt(0).toUpperCase() + loadingState.slice(1)} Loans`
+		}
+	</div>)
 	return (
 		<>
-			<Grid>
+			<Grid>	
 				{fieldLineUp.slice(0, colShown).map((field) => {
 					return (
 						<Col>
@@ -62,39 +85,40 @@ const MappedCards = ({ member, index, fieldLineUp, noActions, ...rest }) => {
 				})}
 			</Grid>
 			<Expand>
-				{colShown >= 15 ? (
-					<div>
-						{
-							noActions ? null : (
-								<div>
-									<Buttons
-										style={{background: '#76d600', color: 'white'}}
-										onClick={() => updateData('approved')}
-									>
-										Approve
-									</Buttons>
-									<Buttons
-										style={{background: '#E12a5a', color: 'white'}}
-										onClick={() => updateData('rejected')}
-									>
-										Reject
-									</Buttons>
-									<Buttons
-										onClick={() => updateData('pending')}
-									>
-										Decide Later
-									</Buttons>
-									<Buttons
-									>
-										<Link to={`/loans/${index}`}>All Details</Link>
-									</Buttons>
-								</div>
-							)
-						}
+				<div>
+					<div style={{
+						display: 'flex'
+					}}>
+						<Buttons
+							style={{background: '#179942', color: 'white'}}
+							onClick={() => updateData('approved')}
+							disabled={loadingState}
+						>
+							Approve
+						</Buttons>
+						<Buttons
+							style={{background: '#FA1103', color: 'white'}}
+							onClick={() => updateData('rejected')}
+							disabled={loadingState}
+						>
+							Reject
+						</Buttons>
 					</div>
-				) : (
-					<div onClick={() => setColShown(colShown + 10)}>...</div>
-				)}
+					<div style={{
+						display: 'flex'
+					}}>
+						<Buttons
+							onClick={() => updateData('pending')}
+							disabled={loadingState}
+							style={{background: '#19858F', color: 'white'}}
+						>
+							Decide Later
+						</Buttons>
+						<Buttons disabled={loadingState}>
+							<Link to={`/loans/${index}`}>All Details</Link>
+						</Buttons>
+					</div>
+				</div>
 			</Expand>
 		</>
 	);

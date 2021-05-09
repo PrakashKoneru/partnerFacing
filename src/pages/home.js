@@ -39,13 +39,15 @@ const StickyContainer = styled.div`
 `
 
 const DisplayItems = styled.div`
-	width: 80%;
+	width: 85%;
+	max-height: calc(100vh - 175px);
+	overflow: scroll;
 `;
 
 const Card = styled.div`
 	padding: 10px 5px;
 	border-radius: 5px;
-	max-width: 80%;
+	max-width: 90%;
 	display: flex;
 	align-items: center;
 	border: 1px solid rgba(224,210,210, 0.6);
@@ -82,7 +84,8 @@ const Input = styled.input`
 `;
 
 export default function Home() {
-	const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
+	// const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
+	const [acceptedData, setAcceptedData] = useState(JSON.parse(localStorage.getItem('acceptedData')));
 	const [sortBy, setSortBy] = useState('funded_amnt');
 	const [filterBy, setFilterBy] = useState('new');
 	const activeTabStyle = { background: '#0079C6', color: 'white'};
@@ -163,14 +166,20 @@ export default function Home() {
 						</StickyContainer>
 					</Actions>
 					<DisplayItems>
-						{console.log(acceptedData, 'acceptedData')}
 						{acceptedData
-							.filter((each) => each.approval_status === filterBy)
+							.filter((each) => {
+								let filterCondition = each.approval_status === filterBy;
+								return filterCondition
+							})
 							.sort((a, b) => a[sortBy] - b[sortBy]).map((member, index) => {
-								console.log(member, 'menber')
 							return (
 								<Card key={Math.random()}>
-									<MappedCards member={member} index={index} fieldLineUp={fieldLineUp}/>
+									<MappedCards
+										member={member}
+										index={index}
+										fieldLineUp={fieldLineUp}
+										setAcceptedData={setAcceptedData}
+									/>
 								</Card>
 							)
 						})}
