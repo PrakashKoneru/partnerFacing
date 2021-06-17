@@ -18,7 +18,10 @@ function App() {
     const updatedData = acceptedData.map((loan) => {
       var oneDate = moment(loan.issue_d, 'MM/DD/YYYY');
       var monthName = oneDate.format('MMMM');
-      loan.issue_m = monthName;
+      const rndInt = Math.floor(Math.random() * 12) + 1
+      const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', "December"]
+      console.log(months.length);
+      loan.issue_m = months[rndInt - 1];
       return loan
     })
     localStorage.setItem('acceptedData', JSON.stringify(updatedData));

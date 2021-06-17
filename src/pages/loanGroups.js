@@ -113,10 +113,11 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
 const LoanGroups = (props) => {
 	const [view, setView] = useState('listView');
-	const [groupingState, setGroupinState] = useState('issue_m');
+	const [groupingState, setGroupinState] = useState('grade');
 	const [expandedLoanGroup, setExpandedLoanGroup] = useState(null)
 	const allLoans = JSON.parse(localStorage.getItem('acceptedData'));
 	const loansBySelectedGroup = allLoans.reduce((loan, value) => {
+		console.log(loan[value[groupingState]], groupingState)
 		if (!loan[value[groupingState]]) {
 			loan[value[groupingState]] = {
 				loans: [],
@@ -204,14 +205,15 @@ const LoanGroups = (props) => {
 								id="loans"
 								onChange={(e) => {setGroupinState(e.target.value)}}
 							>
+								<Option value='grade' default>Grade</Option>
 								<Option value='issue_m'>Month</Option>
-								<Option value='grade'>Grade</Option>
 							</Select>
 						</StickyContainer>
 					</Actions>
 					<div style={{ width: '100%'}}>
 						{Object.keys(loansBySelectedGroup).map((groupName, value) => {
 							const group = loansBySelectedGroup[groupName]
+							console.log(loansBySelectedGroup)
 							return (
 								<div style={{ marginTop: '15px', width: '100%' }}>
 									<GroupActions>
