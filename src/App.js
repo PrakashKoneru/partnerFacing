@@ -8,7 +8,8 @@ import acceptedData from './acceptedData';
 import {
   BrowserRouter as Router,
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import './styles/globals.css';
 
@@ -27,6 +28,13 @@ function App() {
     <Router>
       <Header />
       <Switch>
+        <Route
+          exact
+          path="/"
+          render={() => {
+            return ( <Redirect to="/primary" /> )
+          }}
+        />
         <Route exact path="/primary" component={Home} />
         <Route path="/loans/:index" component={Loans} />
         <Route path="/borrowers" component={Application} />

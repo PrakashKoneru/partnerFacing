@@ -87,7 +87,7 @@ export default function Home() {
 	// const acceptedData = JSON.parse(localStorage.getItem('acceptedData'));
 	const [acceptedData, setAcceptedData] = useState(JSON.parse(localStorage.getItem('acceptedData')));
 	const [sortBy, setSortBy] = useState('funded_amnt');
-	const [filterBy, setFilterBy] = useState('new');
+	const [filterBy, setFilterBy] = useState(null);
 	const activeTabStyle = { background: '#0079C6', color: 'white'};
 	// console.log(acceptedData, 'acceptedData');
     return (
@@ -136,7 +136,7 @@ export default function Home() {
 							<div style={{ marginTop: '30px'}}>
 								<div style={{ fontWeight: '700' }}>Filter By :</div>
 								<div>
-									<div style={{fontSize: '14px', marginTop: '15px'}}>
+									{/* <div style={{fontSize: '14px', marginTop: '15px'}}>
 										<div style={{ fontWeight: '400' }}>Funded Amount</div>
 										<div style={{display: 'flex', marginTop: '7px'}}>
 											<Input placeholder="min" />
@@ -149,12 +149,15 @@ export default function Home() {
 											<Input placeholder="min" type="number" />
 											<Input placeholder="max" type="number" />
 										</div>
-									</div>
+									</div> */}
 									<div style={{fontSize: '14px', marginTop: '15px'}}>
 										<div style={{ fontWeight: '400' }}>Loan Grade</div>
 										<div style={{display: 'flex', marginTop: '7px'}}>
-											<Select style={{ marginTop: '0px', fontSize: '14px', border: '1px solid rgba(224,210,210, 0.6)'}}>
-												<option>---</option>
+											<Select 
+												style={{ marginTop: '0px', fontSize: '14px', border: '1px solid rgba(224,210,210, 0.6)'}}
+												onChange={(e) => setFilterBy(e.target.value)}
+											>
+												<option value="">---</option>
 												<option value="A">A</option>
 												<option value="B">B</option>
 												<option value="C">C</option>
@@ -168,7 +171,7 @@ export default function Home() {
 					<DisplayItems>
 						{acceptedData
 							.filter((each) => {
-								let filterCondition = each.approval_status === filterBy;
+								let filterCondition = filterBy && filterBy.length > 0 ? each.grade === filterBy : true;
 								return filterCondition
 							})
 							.sort((a, b) => a[sortBy] - b[sortBy]).map((member, index) => {
