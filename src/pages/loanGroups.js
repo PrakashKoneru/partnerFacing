@@ -117,7 +117,6 @@ const LoanGroups = (props) => {
 	const [expandedLoanGroup, setExpandedLoanGroup] = useState(null)
 	const allLoans = JSON.parse(localStorage.getItem('acceptedData'));
 	const loansBySelectedGroup = allLoans.reduce((loan, value) => {
-		console.log(loan[value[groupingState]], groupingState)
 		if (!loan[value[groupingState]]) {
 			loan[value[groupingState]] = {
 				loans: [],
@@ -213,7 +212,6 @@ const LoanGroups = (props) => {
 					<div style={{ width: '100%'}}>
 						{Object.keys(loansBySelectedGroup).map((groupName, value) => {
 							const group = loansBySelectedGroup[groupName]
-							console.log(loansBySelectedGroup)
 							return (
 								<div style={{ marginTop: '15px', width: '100%' }}>
 									<GroupActions>
